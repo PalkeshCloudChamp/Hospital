@@ -46,11 +46,6 @@ class staffDal{
             }
             res.status(500).send({message : "User Not Authorized to Perform this action."})
         })
-        // await SequelizeObj.sync({force : false})
-        // let users = await StaffModel.findAll();
-        // if(users)
-        // {return res.status(200).send({value : users});}
-        // return res.status(500).send({message: "Some internal error"})
     }
 
     async addStaff(req,res){
@@ -78,6 +73,12 @@ class staffDal{
     }
 
     async deleteStaffMem(req,res){
+                const token = req.headers.authorization;
+        await jwt.verify(token,jwtSecret.jwtKey , async (error,decode)=>{
+            if(error){return res.status(401).send({message : "Token Not Verified."})}
+            req.decode = decode;
+            let desi = decode.authVal.dataValues.stPDesi;
+            if(desi == "Admin"){
         const id = req.params.id;
         await SequelizeObj.sync({force : false}).then(()=>{
             StaffModel.destroy({
@@ -92,8 +93,17 @@ class staffDal{
         {return res.status(200).send({value : result , message : "User added Successfully"});}
         return res.status(500).send({message: "Some internal error"})
     }
+    return res.status(402).send({message: "User Not Authorized."})
+    })
+}
 
     async updateStaffMem(req,res){
+        const token = req.headers.authorization;
+        await jwt.verify(token,jwtSecret.jwtKey , async (error,decode)=>{
+            if(error){return res.status(401).send({message : "Token Not Verified."})}
+            req.decode = decode;
+            let desi = decode.authVal.dataValues.stPDesi;
+            if(desi == "Admin"){
         const id = parseInt(req.params.id);
         await SequelizeObj.sync({force:false}).then(()=>{
             StaffModel.update({
@@ -111,6 +121,10 @@ class staffDal{
             res.status(200).send({message : "Staff Data Updated" , data : data})
         }).catch(err=>{res.status(500).send({message : "User data cannot be updated. Try again later."})})
     }
+    return res.status(402).send({message: "User Not Authorized."})
+})
+}
+
 
 
     async userType(req,res){

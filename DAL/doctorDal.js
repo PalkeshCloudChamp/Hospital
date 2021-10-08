@@ -34,7 +34,7 @@ class DoctorDal{
             if(error){return res.status(401).send({message : "Token Not Verified."})}
             req.decode = decode;
             let desi = decode.authVal.dataValues.stPDesi;
-            if(desi == "Admin"){
+            if(desi == "Admin" || desi == "Nurse"){
         await SequelizeObj.sync({force : false})
         let users = await StaffModel.findAll();
         if(users)

@@ -39,6 +39,13 @@ class WardDal{
     }
 
     async addWard(req,res){
+        const token = req.headers.authorization;
+        console.log(token);
+        await jwt.verify(token,jwtSecret.jwtKey , async (error,decode)=>{
+            if(error){return res.status(401).send({message : "Token Not Verified."})}
+            req.decode = decode;
+            let desi = decode.authVal.dataValues.stPDesi;
+            if(desi == "Admin"){
         await SequelizeObj.sync({force : false})
         const data = req.body;
         let result = await WardModel.create(data);
@@ -46,8 +53,18 @@ class WardDal{
         {return res.status(200).send({value : result , message : "Ward added Successfully"});}
         return res.status(500).send({message: "Some internal error"})
     }
+    res.status(500).send({message : "User Not Authorized to Perform this action."})
+})
+}
 
     async deleteWard(req,res){
+        const token = req.headers.authorization;
+        console.log(token);
+        await jwt.verify(token,jwtSecret.jwtKey , async (error,decode)=>{
+            if(error){return res.status(401).send({message : "Token Not Verified."})}
+            req.decode = decode;
+            let desi = decode.authVal.dataValues.stPDesi;
+            if(desi == "Admin"){
         const id = req.params.id;
         await SequelizeObj.sync({force : false}).then(()=>{
             WardModel.destroy({
@@ -62,8 +79,19 @@ class WardDal{
         {return res.status(200).send({value : result , message : "User added Successfully"});}
         return res.status(500).send({message: "Some internal error"})
     }
+    res.status(500).send({message : "User Not Authorized to Perform this action."})
+})
+}
+
 
     async updateWard(req,res){
+        const token = req.headers.authorization;
+        console.log(token);
+        await jwt.verify(token,jwtSecret.jwtKey , async (error,decode)=>{
+            if(error){return res.status(401).send({message : "Token Not Verified."})}
+            req.decode = decode;
+            let desi = decode.authVal.dataValues.stPDesi;
+            if(desi == "Admin"){
         const id = parseInt(req.params.id);
         await SequelizeObj.sync({force:false}).then(()=>{
             WardModel.update({
@@ -75,6 +103,10 @@ class WardDal{
             res.status(200).send({message : "Ward Data Updated" , data : data})
         }).catch(err=>{res.status(500).send({message : "User data cannot be updated. Try again later."})})
     }
+    res.status(500).send({message : "User Not Authorized to Perform this action."})
+})
+}
+
 }
 
 module.exports = WardDal;
